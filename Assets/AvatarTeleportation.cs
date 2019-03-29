@@ -6,7 +6,10 @@ public class AvatarTeleportation : MonoBehaviour
 {
     public AudioClip audioClip;
     public GameObject my_camera;
-    public GameObject my_marker;
+    public GameObject position_marker;
+    public GameObject object_marker;
+    public GameObject point_marker;
+    private RaycastHit hit;
     
     // Start is called before the first frame update
     void Start()
@@ -14,26 +17,45 @@ public class AvatarTeleportation : MonoBehaviour
         Cursor.visible = false;
     }
 
-    private void UpdateMarker() {
+    private void UpdateMarkers() {
         Vector3 origin = my_camera.transform.position;
         Vector3 direction = my_camera.transform.forward;
         float range = 1000;
-        RaycastHit hit;
-        if (Physics.Raycast(origin, direction, out hit, range) && hit.point.y <0.01){
+        if (Physics.Raycast(origin, direction, out hit, range)){
             // Debug.DrawRay(origin, direction, Color.green, 2, false);
-            my_marker.transform.position = hit.point;
-            my_marker.GetComponent<Renderer>().material.color = Color.green;
-        } else {
-            my_marker.GetComponent<Renderer>().material.color = Color.red;
+            if ( hit.point.y <0.01) {
+                // ray collide with floor
+                position_marker.SetActive(true);
+                position_marker.transform.position = hit.point;
+                position_marker.GetComponent<Renderer>().material.color = Color.green;
+                point_marker.SetActive(false);
+            } else {
+                // ray collide with object or wall
+                point_marker.SetActive(true);
+                point_marker.transform.position = hit.point;
+                if (hit.transform.gameObject.layer == 10) {
+                    point_marker.GetComponent<Renderer>().material.color = Color.green;
+                } else {
+                    point_marker.GetComponent<Renderer>().material.color = Color.red;
+                }
+                position_marker.SetActive(false);
+            }
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        UpdateMarker();
-        if (Input.GetMouseButtonDown(0) && my_marker.GetComponent<Renderer>().material.color == Color.green) {
-            gameObject.transform.position = my_marker.transform.position;
+        UpdateMarkers();
+        if (Input.GetMouseButtonDown(0)) {
+            if (position_marker.activeSelf) {
+                gameObject.transform.position = position_marker.transform.position;
+            } else if (point_marker.activeSelf && point_marker.GetComponent<Renderer>().material.color == Color.green) {
+                print("hello");
+                object_marker.transform.parent = hit.transform.gameObject.transform;
+                object_marker.GetComponent<Renderer>().material.color = Color.green;
+                object_marker.transform.localPosition = new Vector3(0,1,0);
+            }
         }
     }
 }
