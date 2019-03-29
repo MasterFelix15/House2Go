@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AvatarTeleportation : MonoBehaviour
+public class PlayerBehavior : MonoBehaviour
 {
     public AudioClip audioClip;
     public GameObject my_camera;
@@ -10,6 +10,7 @@ public class AvatarTeleportation : MonoBehaviour
     public GameObject object_marker;
     public GameObject point_marker;
     private RaycastHit hit;
+    private GameObject selected;
     
     // Start is called before the first frame update
     void Start()
@@ -51,8 +52,12 @@ public class AvatarTeleportation : MonoBehaviour
             if (position_marker.activeSelf) {
                 gameObject.transform.position = position_marker.transform.position;
             } else if (point_marker.activeSelf && point_marker.GetComponent<Renderer>().material.color == Color.green) {
-                print("hello");
-                object_marker.transform.parent = hit.transform.gameObject.transform;
+                if (selected != null) {
+                    selected.GetComponent<ObjectBehavior>().SetSelect(false);
+                }
+                selected = hit.transform.gameObject;
+                selected.GetComponent<ObjectBehavior>().SetSelect(true);
+                object_marker.transform.parent = selected.transform;
                 object_marker.GetComponent<Renderer>().material.color = Color.green;
                 object_marker.transform.localPosition = new Vector3(0,1,0);
             }
