@@ -8,8 +8,11 @@ public class PlayerBehavior : MonoBehaviour
     private GameObject position_marker;
     private GameObject object_marker;
     private GameObject point_marker;
+    public GameObject object_menu;
     private RaycastHit hit;
     private GameObject selected;
+    public int numOfPages;
+    private int pageNum;
     private int state;
     
     // Start is called before the first frame update
@@ -19,8 +22,10 @@ public class PlayerBehavior : MonoBehaviour
         position_marker = GameObject.Find("PositionMarker");
         object_marker = GameObject.Find("ObjectMarker");
         point_marker = GameObject.Find("PointMarker");
+        // object_menu = GameObject.Find("Object Menu");
         Cursor.visible = false;
         state = -1;
+        pageNum = 0;
     }
 
     private void UpdateMarkers() {
@@ -82,7 +87,6 @@ public class PlayerBehavior : MonoBehaviour
                     Select(hit.transform.gameObject);
                     break;
                 case 2: // ray collide with menu option
-                    print("we are here");
                     GameObject newObject = GameObject.Instantiate(hit.transform.parent.Find("model").gameObject);
                     newObject.transform.localScale = new Vector3(1,1,1);
                     newObject.AddComponent<ObjectBehavior>();
@@ -91,8 +95,13 @@ public class PlayerBehavior : MonoBehaviour
                     newObject.GetComponent<ObjectBehavior>().AttachToMarker();
                     break;
                 case 3: // ray collide with menu button
+                    GameObject buttonHit = hit.transform.parent.gameObject;
+                    object_menu.GetComponent<MenuBehavior>().Apply(buttonHit.name);
                     break;
             }
+        }
+        if (Input.GetKeyDown(KeyCode.F)) {
+            object_menu.SetActive(!object_menu.activeSelf);
         }
     }
 }
