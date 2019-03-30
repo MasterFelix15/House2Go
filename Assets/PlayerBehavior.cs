@@ -4,18 +4,23 @@ using UnityEngine;
 
 public class PlayerBehavior : MonoBehaviour
 {
-    public AudioClip audioClip;
-    public GameObject my_camera;
-    public GameObject position_marker;
-    public GameObject object_marker;
-    public GameObject point_marker;
+    private GameObject my_camera;
+    private GameObject position_marker;
+    private GameObject object_marker;
+    private GameObject point_marker;
     private RaycastHit hit;
     private GameObject selected;
+    private int state;
     
     // Start is called before the first frame update
     void Start()
     {
+        my_camera = GameObject.Find("Main Camera");
+        position_marker = GameObject.Find("PositionMarker");
+        object_marker = GameObject.Find("ObjectMarker");
+        point_marker = GameObject.Find("PointMarker");
         Cursor.visible = false;
+        state = -1;
     }
 
     private void UpdateMarkers() {
@@ -26,6 +31,7 @@ public class PlayerBehavior : MonoBehaviour
             // Debug.DrawRay(origin, direction, Color.green, 2, false);
             if ( hit.point.y <0.01) {
                 // ray collide with floor
+                state = 0;
                 position_marker.SetActive(true);
                 position_marker.transform.position = hit.point;
                 position_marker.GetComponent<Renderer>().material.color = Color.green;
@@ -35,8 +41,16 @@ public class PlayerBehavior : MonoBehaviour
                 point_marker.SetActive(true);
                 point_marker.transform.position = hit.point;
                 if (hit.transform.gameObject.layer == 10) {
+                    state = 1;
                     point_marker.GetComponent<Renderer>().material.color = Color.green;
+                } else if (hit.transform.gameObject.layer == 11) {
+                    state = 2;
+                    point_marker.GetComponent<Renderer>().material.color = Color.blue;
+                } else if (hit.transform.gameObject.layer == 12) {
+                    state = 3;
+                    point_marker.GetComponent<Renderer>().material.color = Color.blue;
                 } else {
+                    state = 4;
                     point_marker.GetComponent<Renderer>().material.color = Color.red;
                 }
                 position_marker.SetActive(false);
@@ -44,22 +58,40 @@ public class PlayerBehavior : MonoBehaviour
         }
     }
 
+    private void Select(GameObject go) {
+        if (selected != null) {
+            selected.GetComponent<ObjectBehavior>().SetSelect(false);
+        }
+        selected = go;
+        selected.GetComponent<ObjectBehavior>().SetSelect(true);
+        object_marker.transform.parent = selected.transform;
+        object_marker.GetComponent<Renderer>().material.color = Color.green;
+        object_marker.transform.localPosition = new Vector3(0,1,0);
+    }
+
     // Update is called once per frame
     void Update()
     {
         UpdateMarkers();
         if (Input.GetMouseButtonDown(0)) {
-            if (position_marker.activeSelf) {
-                gameObject.transform.position = position_marker.transform.position;
-            } else if (point_marker.activeSelf && point_marker.GetComponent<Renderer>().material.color == Color.green) {
-                if (selected != null) {
-                    selected.GetComponent<ObjectBehavior>().SetSelect(false);
-                }
-                selected = hit.transform.gameObject;
-                selected.GetComponent<ObjectBehavior>().SetSelect(true);
-                object_marker.transform.parent = selected.transform;
-                object_marker.GetComponent<Renderer>().material.color = Color.green;
-                object_marker.transform.localPosition = new Vector3(0,1,0);
+            switch (state) {
+                case 0: // ray collide with floor
+                    gameObject.transform.position = position_marker.transform.position;
+                    break;
+                case 1: // ray collide with object
+                    Select(hit.transform.gameObject);
+                    break;
+                case 2: // ray collide with menu option
+                    print("we are here");
+                    GameObject newObject = GameObject.Instantiate(hit.transform.parent.Find("model").gameObject);
+                    newObject.transform.localScale = new Vector3(1,1,1);
+                    newObject.AddComponent<ObjectBehavior>();
+                    Select(newObject);
+                    newObject.GetComponent<ObjectBehavior>().SetPositionMarker(position_marker);
+                    newObject.GetComponent<ObjectBehavior>().AttachToMarker();
+                    break;
+                case 3: // ray collide with menu button
+                    break;
             }
         }
     }
