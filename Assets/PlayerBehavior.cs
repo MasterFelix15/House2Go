@@ -102,6 +102,16 @@ public class PlayerBehavior : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.F)) {
             object_menu.SetActive(!object_menu.activeSelf);
+            Vector3 camera_facing = my_camera.transform.forward;
+            object_menu.transform.localPosition = 3.5f * new Vector3(camera_facing.x, 0, camera_facing.z) + new Vector3(0, 2.1f, 0);
+            object_menu.transform.LookAt(my_camera.transform.position);
+        }
+        if (Input.GetKeyDown(KeyCode.R)) {
+            object_marker.transform.parent = transform.parent;
+            object_marker.transform.position = new Vector3(0,0,0);
+            if (selected != null) {
+                Destroy(selected);
+            }
         }
     }
 }
