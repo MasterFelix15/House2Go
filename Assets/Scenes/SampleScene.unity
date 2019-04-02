@@ -135,6 +135,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3631573157805386796, guid: 7921f9a4306b3438985568fabd36b5b0,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3631573158460478387, guid: 7921f9a4306b3438985568fabd36b5b0,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -199,11 +204,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Menu_Page_2
-      objectReference: {fileID: 0}
-    - target: {fileID: 3631573157805386796, guid: 7921f9a4306b3438985568fabd36b5b0,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3631573157847073157, guid: 7921f9a4306b3438985568fabd36b5b0,
         type: 3}
@@ -1939,6 +1939,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   object_menu: {fileID: 2111354008}
   numOfPages: 0
+  audio_teleport: {fileID: 8300000, guid: c1c1d703b70bb4151a76222107bbc1ab, type: 3}
+  audio_click: {fileID: 8300000, guid: 2c922bdfa28c84567b08813a1465e248, type: 3}
+  audio_open: {fileID: 8300000, guid: abe2f3aa2a2ab4ed8baa27c98718fd9b, type: 3}
 --- !u!1001 &1107635004
 PrefabInstance:
   m_ObjectHideFlags: 0

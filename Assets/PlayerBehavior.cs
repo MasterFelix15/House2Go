@@ -14,6 +14,10 @@ public class PlayerBehavior : MonoBehaviour
     public int numOfPages;
     private int pageNum;
     private int state;
+    public AudioClip audio_teleport;
+    public AudioClip audio_click;
+    public AudioClip audio_open;
+    private AudioSource audio_source;
     
     // Start is called before the first frame update
     void Start()
@@ -26,6 +30,7 @@ public class PlayerBehavior : MonoBehaviour
         Cursor.visible = false;
         state = -1;
         pageNum = 0;
+        audio_source = gameObject.AddComponent<AudioSource>();
     }
 
     private void UpdateMarkers() {
@@ -82,9 +87,13 @@ public class PlayerBehavior : MonoBehaviour
             switch (state) {
                 case 0: // ray collide with floor
                     gameObject.transform.position = position_marker.transform.position;
+                    audio_source.clip = audio_teleport;
+                    audio_source.Play();
                     break;
                 case 1: // ray collide with object
                     Select(hit.transform.gameObject);
+                    audio_source.clip = audio_click;
+                    audio_source.Play();
                     break;
                 case 2: // ray collide with menu option
                     GameObject newObject = GameObject.Instantiate(hit.transform.parent.Find("model").gameObject);
@@ -93,10 +102,14 @@ public class PlayerBehavior : MonoBehaviour
                     Select(newObject);
                     newObject.GetComponent<ObjectBehavior>().SetPositionMarker(position_marker);
                     newObject.GetComponent<ObjectBehavior>().AttachToMarker();
+                    audio_source.clip = audio_click;
+                    audio_source.Play();
                     break;
                 case 3: // ray collide with menu button
                     GameObject buttonHit = hit.transform.parent.gameObject;
                     object_menu.GetComponent<MenuBehavior>().Apply(buttonHit.name);
+                    audio_source.clip = audio_click;
+                    audio_source.Play();
                     break;
             }
         }
@@ -105,6 +118,8 @@ public class PlayerBehavior : MonoBehaviour
             Vector3 camera_facing = my_camera.transform.forward;
             object_menu.transform.localPosition = 3.5f * new Vector3(camera_facing.x, 0, camera_facing.z) + new Vector3(0, 2.1f, 0);
             object_menu.transform.LookAt(my_camera.transform.position);
+            audio_source.clip = audio_open;
+            audio_source.Play();
         }
         if (Input.GetKeyDown(KeyCode.R)) {
             object_marker.transform.parent = transform.parent;
